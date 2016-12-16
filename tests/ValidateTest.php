@@ -8,5 +8,5 @@
 namespace glluchcom\csdlScraping;
 require '../Validate.class.php';
 
-$filename = "validate/array.html";
+$filename = "validate/information services.html";
 Validate::file2Xml($filename);

@@ -17,10 +17,26 @@ class Validate
         $path = $fileInfo['dirname'];
         $filename = $fileInfo['filename'];
         $basename = $fileInfo['basename'];
-        $newfilename = $path . "/" . $filename . ".xhtml";
-        $newfilename = $path . "/" . $basename;
 
+        $newfilename = $path . "/" . $basename;
+        self::checkXMLDeclaration($newfilename);
         @$doc->loadHTMLFile($filen);
-        $doc->save($newfilename);
+        $doc->save($newfilename,LIBXML_NOXMLDECL);
+    }
+
+    //LIBXML_NOXMLDECL doesn't work
+    protected static function checkXMLDeclaration($filen){
+        $newfile="";
+        $html0=file_get_contents($filen);
+        $html=explode("\n",$html0);//array line by line
+        foreach($html as $line ) {
+                 $line1 = explode(" ", $line);
+            if (!in_array("<?xml",$line1)){
+                $newfile.=$line;
+            }
+        }
+        file_put_contents($filen,$newfile);
+
+
     }
 }
