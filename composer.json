@@ -1,0 +1,15 @@
+{
+  "name": "csdlScraping",
+  "description": "web scraping for IEEE computers search page",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Guillem LLuch Moll",
+      "email": "guillem72@gmail.com"
+    }
+  ],
+  "require": {
+    "apache/log4php": "2.3.0"
+  }
+}
