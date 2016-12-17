@@ -5,7 +5,7 @@
  * Time: 00:21
  */
 
-namespace glluchcom\csdlScraping;
+namespace glluchcom\csdlExtractor;
 
 
 class Validate

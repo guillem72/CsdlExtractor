@@ -3,7 +3,7 @@
  * User: Guillem LLuch
  */
 
-namespace glluchcom\csdlScraping;
+namespace glluchcom\csdlExtractor;
 
 require 'Validate.class.php';
 

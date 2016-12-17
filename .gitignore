@@ -4,3 +4,5 @@ trace.log
 config.xml
 .idea
 .gitignore
+vendor
+/composer.lock
