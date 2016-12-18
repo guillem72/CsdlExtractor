@@ -27,7 +27,7 @@ class IEEEGateway
     {
         $files0 = file_get_contents($filename);
         $files = explode("\n", $files0);
-        $titles = array();
+
         foreach ($files as $file) {
             if ($file != "") {
                 $term = trim($file);

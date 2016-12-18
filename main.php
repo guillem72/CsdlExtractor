@@ -9,16 +9,35 @@
 include_once('CsdlExtractor.class.php');
 include_once('IO.class.php');
 include_once('IEEEGateway.class.php');
+include_once('IEEEGatewayExtractor.class.php');
 
-$results = extractFromDir("files.txt");
+//First
+//IEEEgateway();
+//Second
+extractRelated();
+
+function extractRelated()
+{
+    $ieeege = new \glluchcom\csdlExtractor\IEEEGatewayExtractor();
+    $ieeege->getTermsRelated("files.txt");
+}
+
+/**
+ * Save the xml response from IEEE gateway for each article related with each
+ * term in files.txt.
+ */
+function IEEEgateway()
+{
+    $results = extractFromDir("files.txt");
 //var_dump($results);
 
-$title = "Machine learning nuclear detonation features";
-$ieee = new \glluchcom\csdlExtractor\IEEEGateway();
+    //$title = "Machine learning nuclear detonation features";
+    $ieee = new \glluchcom\csdlExtractor\IEEEGateway();
 //$ieee->retrieve($title,"xml/");
-$ieee->foreachTerm($results, "files.txt");
-//\glluchcom\csdlExtractor\IO::xmlFile2Object("xml/".$title.".xml");
+    $ieee->foreachTerm($results, "files.txt");
 
+
+}
 
 /**
  * @param $filename . The name of the file which contains the list of terms.
