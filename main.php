@@ -19,7 +19,8 @@ extractRelated();
 function extractRelated()
 {
     $ieeege = new \glluchcom\csdlExtractor\IEEEGatewayExtractor();
-    $ieeege->getTermsRelated("files.txt");
+    $result = $ieeege->getTermsRelated("files.txt");
+    var_dump($result);
 }
 
 /**

@@ -25,7 +25,7 @@ class IEEEGatewayExtractor
      */
     public function getTermsRelated($filename)
     {
-        if ($this->termsRelated . size == 0) $this->extractAll($filename);
+        if (count($this->termsRelated) == 0) $this->extractAll($filename);
         return $this->termsRelated;
     }
 
@@ -62,13 +62,15 @@ class IEEEGatewayExtractor
 
                     $name0 = $fileInfo["filename"];
                     $names = explode("_", $name0);
+                    $location = $fileInfo["dirname"];
                     $pos = $names[0];
                     $name = $names[1];
 
-                    $text = file_get_contents($file);
+                    $text = file_get_contents($path . $file);
 
-                    $xmldoc = new DOMDocument();
-                    if (@$xmldoc->load($text)) {
+                    $xmldoc = new \DOMDocument();
+
+                    if (@$xmldoc->loadXML($text)) {
                         $terms = $this->extractOne($xmldoc);
                         $terms["pos"] = $pos;
                         $terms["name"] = $name;
