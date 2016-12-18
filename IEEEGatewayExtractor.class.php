@@ -64,7 +64,7 @@ class IEEEGatewayExtractor
                     $names = explode("_", $name0);
                     $location = $fileInfo["dirname"];
                     $pos = $names[0];
-                    $name = $names[1];
+                    //$name = $names[1];
 
                     $text = file_get_contents($path . $file);
 
@@ -73,8 +73,8 @@ class IEEEGatewayExtractor
                     if (@$xmldoc->loadXML($text)) {
                         $terms = $this->extractOne($xmldoc);
                         $terms["pos"] = $pos;
-                        $terms["name"] = $name;
-                        $related = array_merge($related, $terms);
+                        //$terms["name"] = $name;
+                        $related = termsMerge($related, $terms, $pos);
                     }
 
                 }
@@ -82,7 +82,6 @@ class IEEEGatewayExtractor
         }
         return $related;
     }
-
 
     public function extractOne($domXml)
     {
@@ -103,5 +102,48 @@ class IEEEGatewayExtractor
             }
         }
         return array("controlled" => $this->controlledTerms, "thesaurus" => $this->thesaurusTerms);
+    }
+
+    /**
+     * Add terms in a matrix of terms. The terms act as column title and its value
+     * is its aggregate counts.
+     * @param $related . The matrix where the new counts will be added.
+     * @param $terms . A matrix containing new counts to be added to related.
+     * @param $pos . A factor which represents the rank of the actual $terms.
+     * So, a smaller number is more important than a greater one.
+     * @return mixed . A new matrix with the new terms added and the old one
+     * updated.
+     */
+    protected function termsMerge($related, $terms, $pos)
+    {
+        foreach ($terms as $term) {
+            $weight = 0;
+            if (array_key_exists($term, $related)) { //$term is in $related
+                $weight = $related[$term];
+            }
+            $weight += $this->calcWeight($pos); //for 0 => 1. for 20 => 0'6;
+            $related[$term] = $weight;
+        }
+        return $related;
+    }
+
+    protected function calcWeight($rank)
+    {
+        $method = "expDecay";
+        call_user_func($method, $rank);
+    }
+
+    /**
+     *
+     * @param $rank int (between 0 and 50)
+     */
+    protected function expDecay($rank)
+    {
+        return exp(-0.07824 * $rank);
+    }
+
+    protected function linealDecay($rank)
+    {
+        return (50 - $rank / 50);
     }
 }
