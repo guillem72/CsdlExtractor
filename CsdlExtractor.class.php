@@ -54,6 +54,9 @@ class Extractor extends \DOMDocument
 
     }
 
+
+
+
     //https://www.computer.org/web/search?cs_search_action=advancedsearch&search-options=dl&searchOperation=exact&searchText=swot
 
     /**

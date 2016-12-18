@@ -12,7 +12,7 @@ namespace glluchcom\csdlExtractor;
  * Class SaveResults Save generic objects in a file.
  * @package glluchcom\csdlScraping
  */
-class SaveResults
+class IO
 {
     /**
      * Save an object with serialize function from php.
@@ -24,6 +24,20 @@ class SaveResults
     {
         $phpThing = serialize($thing);
         return file_put_contents($filename, $phpThing);
+
+    }
+
+    public static function obtainPhpFormat($filename)
+    {
+        return unserialize($filename);
+    }
+
+    public static function xmlFile2Object($filename)
+    {
+        $string = file_get_contents($filename);
+        $xml = simplexml_load_string($string);
+        //print_r($xml);
+        return $xml;
 
     }
 }
