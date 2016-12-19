@@ -39,7 +39,7 @@ class IEEEGatewayExtractor
             if ($file != "") {
                 $term = trim($file);
                 $dir = "xml/" . $term . "/";
-                $terms = $this->extractTerms($dir);
+                $terms = $this->extractTerms($dir, true);
                 $this->termsRelated[$term] = $terms;
             }
         }
@@ -50,11 +50,20 @@ class IEEEGatewayExtractor
     /**
      * For a term search all related term in the term dir.
      * @param $path . The name of the dir where the xml file reside.
-     */
-    protected function extractTerms($path)
+     * @param $orderByValues . Boolean which indicates if the order will base
+     * on values (true) or on key, by alphabetic order (false)
+     * @return array . A complex array made by terms controlled and thesaurus
+     * with its weight
+     *
+     **/
+    protected function extractTerms($path, $orderByValues)
     {
         $dir = opendir($path);
+        /** @var array $related sourceTerm =&lt; array ( type of term =&lt;
+         * array(term =&lt; its weight) )*/
         $related = array();
+        $related["controlled"] = array();
+        $related["thesaurus"] = array();
         while ($file = readdir($dir)) {
             if (!is_dir($file) && $file != "." && $file != "..") {
                 $fileInfo = pathinfo($file);
@@ -74,11 +83,18 @@ class IEEEGatewayExtractor
                         $terms = $this->extractOne($xmldoc);
                         $terms["pos"] = $pos;
                         //$terms["name"] = $name;
-                        $related = termsMerge($related, $terms, $pos);
+                        $related = $this->allTermsMerge($related, $terms, $pos);
                     }
 
                 }
             }
+        }
+        if ($orderByValues) {
+            arsort($related["controlled"], SORT_NUMERIC);
+            arsort($related["thesaurus"], SORT_NUMERIC);
+        } else {
+            ksort($related["controlled"]);
+            ksort($related["thesaurus"]);
         }
         return $related;
     }
@@ -101,7 +117,8 @@ class IEEEGatewayExtractor
                 $this->thesaurusTerms[] = trim($item->nodeValue);
             }
         }
-        return array("controlled" => $this->controlledTerms, "thesaurus" => $this->thesaurusTerms);
+        return array("controlled" => $this->controlledTerms,
+            "thesaurus" => $this->thesaurusTerms);
     }
 
     /**
@@ -114,23 +131,50 @@ class IEEEGatewayExtractor
      * @return mixed . A new matrix with the new terms added and the old one
      * updated.
      */
+    protected function allTermsMerge($related, $terms, $pos)
+    {
+        if ($related === null || !is_array($related)) {
+            echo "ERROR in the type of object " . PHP_EOL;
+            echo " pos=" . $pos . PHP_EOL;
+            var_dump($related);
+            return false;
+        }
+
+        $related["controlled"] = $this->termsMerge($related["controlled"],
+            $terms["controlled"], $pos);
+
+        $related["thesaurus"] = $this->termsMerge($related["thesaurus"],
+            $terms["thesaurus"], $pos);
+        return $related;
+    }
+
     protected function termsMerge($related, $terms, $pos)
     {
+        if ($related === null || !is_array($related)) {
+            echo "ERROR in the type of object " . PHP_EOL;
+            echo " pos=" . $pos . PHP_EOL;
+            var_dump($related);
+            return false;
+        }
         foreach ($terms as $term) {
-            $weight = 0;
-            if (array_key_exists($term, $related)) { //$term is in $related
-                $weight = $related[$term];
+            if ($term !== null && $term != "") {
+
+                $weight = 0;
+                if (array_key_exists($term, $related)) { //$term is in $related
+                    $weight = $related[$term];
+                }
+                $weight += $this->calcWeight($pos); //for 0 => 1. for 20 => 0'6;
+                //echo "term is ";
+                //var_dump($term);
+                $related[$term] = $weight;
             }
-            $weight += $this->calcWeight($pos); //for 0 => 1. for 20 => 0'6;
-            $related[$term] = $weight;
         }
         return $related;
     }
 
     protected function calcWeight($rank)
     {
-        $method = "expDecay";
-        call_user_func($method, $rank);
+        return $this->expDecay($rank);
     }
 
     /**
