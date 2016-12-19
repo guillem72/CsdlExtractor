@@ -1,5 +1,6 @@
 # CsdlExtractor
-Extract with php CLI the titles of the articles form a search in computers.org.
+Extract with php CLI the titles of the articles and their related terms 
+form a search in computers.org.
  I have used it with php 7 on linux ubuntu,
 but it is likely that it would work with php 5.
 
